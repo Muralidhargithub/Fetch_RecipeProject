@@ -11,13 +11,11 @@ import Foundation
 
 class MockApiService: RecipeApiInterface {
     
-    // ✅ Mock Recipes (for success cases)
     private let mockRecipes: [RecipeCusine] = [
-        RecipeCusine(id: "1", name: "Pancakes", cuisine: "American", photoURLLarge: nil, photoURLSmall: nil, sourceURL: nil, youtubeURL: nil),
+        RecipeCusine(id: "1", name: "Pancakes", cuisine: "American", photoURLLarge: "https://d3jbb8n5wk0qxi.cloudfront.net/photos/b6efe075-6982-4579-b8cf-013d2d1a461b/large.jpg", photoURLSmall: "https://d3jbb8n5wk0qxi.cloudfront.net/photos/b6efe075-6982-4579-b8cf-013d2d1a461b/small.jpg", sourceURL: nil, youtubeURL: nil),
         RecipeCusine(id: "2", name: "Sushi", cuisine: "Japanese", photoURLLarge: nil, photoURLSmall: nil, sourceURL: nil, youtubeURL: nil)
     ]
     
-    // ✅ Flags to simulate different scenarios
     var shouldReturnEmpty = false
     var shouldReturnMalformed = false
     var shouldFail = false
@@ -39,6 +37,6 @@ class MockApiService: RecipeApiInterface {
         if shouldFail {
             throw NetworkError.networkFailure("Failed to fetch image")
         }
-        return UIImage(systemName: "photo")!  // ✅ Mock Image
+        return UIImage(systemName: "photo")! 
     }
 }

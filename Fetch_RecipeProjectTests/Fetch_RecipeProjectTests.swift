@@ -11,34 +11,85 @@ import XCTest
 final class Fetch_RecipeProjectTests: XCTestCase {
     
     var mockService: MockApiService!
-        var viewModel: RecipeViewModel!
+    var viewModel: RecipeViewModel!
+
+    override func setUp() {
+        super.setUp()
+        mockService = MockApiService()
+        viewModel = RecipeViewModel(networkManager: mockService)
+    }
+
+    override func tearDown() {
+        mockService = nil
+        viewModel = nil
+        super.tearDown()
+    }
+
+    func testFetchRecipes_Success() async {
+        let expectation = XCTestExpectation(description: "Fetch recipes should complete")
         
-        override func setUp() {
-            super.setUp()
-            mockService = MockApiService()
-            viewModel = RecipeViewModel(networkManager: mockService)
-        }
+        mockService.shouldReturnEmpty = false
+        mockService.shouldFail = false
+        mockService.shouldReturnMalformed = false
         
-        override func tearDown() {
-            mockService = nil
-            viewModel = nil
-            super.tearDown()
-        }
-        
-        func testFetchRecipes_Success() async {
+        Task {
             await viewModel.fetchData()
-            XCTAssertEqual(viewModel.foodGroups.count, 2, "✅ Should return 2 recipes")
+            expectation.fulfill()
         }
         
-        func testFetchRecipes_Empty() async {
-            mockService.shouldReturnEmpty = true
-            await viewModel.fetchData()
-            XCTAssertTrue(viewModel.foodGroups.isEmpty, "✅ Should return an empty list")
-        }
+        await fulfillment(of: [expectation], timeout: 2)
+        XCTAssertEqual(viewModel.foodGroups.count, 2, "Should return 2 recipes")
+    }
+    
+    func testFetchRecipes_Empty() async {
+        let expectation = XCTestExpectation(description: "Fetch should return empty list")
+
+        mockService.shouldReturnEmpty = true
         
-        func testFetchRecipes_MalformedJSON() async {
-            mockService.shouldReturnMalformed = true
+        Task {
             await viewModel.fetchData()
-            XCTAssertTrue(viewModel.foodGroups.isEmpty, "✅ Should discard malformed JSON")
+            expectation.fulfill()
+        }
+
+        await fulfillment(of: [expectation], timeout: 2)
+        XCTAssertEqual(viewModel.foodGroups.count, 0, "Should return an empty list")
+    }
+    
+    func testFetchRecipes_MalformedJSON() async {
+        let expectation = XCTestExpectation(description: "Fetch should fail due to malformed JSON")
+
+        mockService.shouldReturnMalformed = true
+        
+        Task {
+            await viewModel.fetchData()
+            expectation.fulfill()
+        }
+
+        await fulfillment(of: [expectation], timeout: 2)
+        XCTAssertEqual(viewModel.foodGroups.count, 0, "Malformed JSON should return empty list")
+    }
+
+    func testFetchRecipes_NetworkFailure() async {
+        let expectation = XCTestExpectation(description: "Fetch should fail due to network issue")
+
+        mockService.shouldFail = true
+        
+        Task {
+            await viewModel.fetchData()
+            expectation.fulfill()
+        }
+
+        await fulfillment(of: [expectation], timeout: 2)
+        XCTAssertEqual(viewModel.foodGroups.count, 0, "Network failure should return empty list")
+    }
+
+    func testFetchImage_Success() async {
+        do {
+            let image = try await mockService.fetchImages(url: "https://example.com/image.png")
+            XCTAssertNotNil(image, "Image should be successfully fetched")
+        } catch {
+            XCTFail("Fetching image should not fail")
         }
     }
+
+}

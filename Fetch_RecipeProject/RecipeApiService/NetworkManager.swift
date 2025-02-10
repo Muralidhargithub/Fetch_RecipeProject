@@ -72,7 +72,7 @@ class RecipeApiService: RecipeApiInterface {
         }
         
         if let diskImage = loadImageFromDisk(url: url) {
-            print("✅ Loaded from Disk Cache: \(url)")
+            print("Loaded from Disk Cache: \(url)")
             imageCache.setObject(diskImage, forKey: url as NSString)
             return diskImage
         }
