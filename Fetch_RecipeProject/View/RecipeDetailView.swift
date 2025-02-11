@@ -5,48 +5,77 @@
 //  Created by Muralidhar reddy Kakanuru on 2/8/25.
 //
 
-
 import SwiftUI
 
 struct RecipeDetailView: View {
     let recipe: RecipeCusine
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 10) {
-                AsyncImage(url: URL(string: recipe.photoURLLarge ?? "")) { image in
-                    image.resizable()
-                } placeholder: {
-                    ProgressView()
-                }
-                .frame(height: 250)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-
-                Text(recipe.name)
-                    .font(.largeTitle)
-                    .bold()
-
-                Text("Cuisine: \(recipe.cuisine)")
-                    .font(.title3)
-                    .foregroundColor(.gray)
-
-                if let sourceURL = recipe.sourceURL, let url = URL(string: sourceURL) {
-                    Link("View Full Recipe", destination: url)
-                        .font(.headline)
-                        .foregroundColor(.blue)
-                }
-
-                if let youtubeURL = recipe.youtubeURL, let url = URL(string: youtubeURL) {
-                    Link("Watch on YouTube", destination: url)
-                        .font(.headline)
-                        .foregroundColor(.red)
-                }
-
-                Spacer()
+        VStack {
+            // Recipe Image
+            AsyncImage(url: URL(string: recipe.photoURLLarge ?? recipe.photoURLSmall ?? "")) { image in
+                image.resizable()
+                    .scaledToFit()
+                    .frame(height: 250)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+            } placeholder: {
+                ProgressView()
             }
             .padding()
+
+            // Recipe Name
+            Text(recipe.name)
+                .font(.title)
+                .fontWeight(.bold)
+                .foregroundColor(.black)
+                .padding(.top, 10)
+
+                .padding(.vertical)
+
+            // Action Buttons
+            VStack(spacing: 5) {
+                if let sourceURL = recipe.sourceURL, !sourceURL.isEmpty {
+                    Button(action: {
+                        if let url = URL(string: sourceURL) {
+                            UIApplication.shared.open(url)
+                        }
+                    }) {
+                        Text("View Recipe")
+                            .fontWeight(.bold)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.black)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                }
+
+                if let youtubeURL = recipe.youtubeURL, !youtubeURL.isEmpty {
+                    Button(action: {
+                        if let url = URL(string: youtubeURL) {
+                            UIApplication.shared.open(url)
+                        }
+                    }) {
+                        Text("Watch on YouTube")
+                            .fontWeight(.bold)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.red)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                }
+            }
+            .padding(.horizontal)
+
+            Spacer()
         }
-        .navigationTitle("Recipe Details")
+        .padding()
+        .background(Color(.systemGroupedBackground))
         .navigationBarTitleDisplayMode(.inline)
     }
 }
+
+
+
+

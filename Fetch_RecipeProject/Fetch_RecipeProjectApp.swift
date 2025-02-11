@@ -14,7 +14,7 @@ struct Fetch_RecipeProjectApp: App {
     var body: some Scene {
         WindowGroup {
             let apiService: RecipeApiInterface = useMockAPI ? MockApiService() : RecipeApiService.shared
-            ContentView()
+            LaunchView()
                 .environment(RecipeViewModel(networkManager: apiService)) 
         }
     }
